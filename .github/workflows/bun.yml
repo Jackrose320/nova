@@ -19,8 +19,14 @@ jobs:
                   path: ./.db_publishing
             - run: cd .db_publishing && bun install --frozen-lockfile
             - run: bunx verdaccio --listen 0.0.0.0:4873 &
-            - name: Publish with Verdaccio
-              uses: verdaccio/github-actions/publish@master
+            - run: apt-add-repository universe && apt-get install expect
+            - run: >
+                  /usr/bin/expect -c "spawn bunx npm adduser --registry
+                  http://localhost:4873; expect \"Username:\"; send
+                  \"developer\r\"; expect \"Password:\"; send \"P@ssw0rd\r\";
+                  expect \"Email: (this IS public)\"; send
+                  \"developer@nexirift.com\r\"; expect eof"
+            - run: bun publish --registry http://localhost:4873
             - run: cd ..
             - name: Install dependencies
               run: bun install --frozen-lockfile
@@ -28,29 +34,3 @@ jobs:
               run: bun run db:generate
             - name: Run tests
               run: bun test --preload ./src/server.ts
-
-    coverage:
-        name: Coverage
-
-        runs-on: ubuntu-latest
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Set up Bun
-              uses: oven-sh/setup-bun@v2
-            - uses: actions/checkout@master
-              with:
-                  repository: Nexirift/db
-                  path: ./.db_publishing
-            - run: cd .db_publishing && bun install --frozen-lockfile
-            - run: bunx verdaccio &
-            - name: Publish with Verdaccio
-              uses: verdaccio/github-actions/publish@master
-            - run: cd ..
-            - name: Install dependencies
-              run: bun install --frozen-lockfile
-            - name: Generate migrations
-              run: bun run db:generate
-            - name: Run tests
-              run: bun test --preload ./src/server.ts --coverage
