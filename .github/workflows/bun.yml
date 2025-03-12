@@ -30,7 +30,7 @@ jobs:
                   \"developer@nexirift.com\r\"; expect eof"
             - run:
                   sed -n '/127\.0\.0\.1/p' ~/.npmrc | sed
-                  's/127\.0\.0\.1/localhost/g' >> ~/.npmrc
+                  's/127\.0\.0\.1/localhost/g' >> ~/.npmrc && cat ~/.npmrc
             - run: bun publish --registry http://localhost:4873
             - run: cd ..
             - name: Install dependencies
