@@ -22,21 +22,19 @@ jobs:
             - run:
                   sudo apt-add-repository universe && sudo apt-get install
                   expect
-            - run: >
+            - name: Add 'developer' user to the registry
+              run: >
                   /usr/bin/expect -c "spawn bunx npm adduser --registry
                   http://localhost:4873; expect \"Username:\"; send
                   \"developer\r\"; expect \"Password:\"; send \"P@ssw0rd\r\";
                   expect \"Email: (this IS public)\"; send
                   \"developer@nexirift.com\r\"; expect eof"
-            - run:
-                  sed -n '/localhost/p' ~/.npmrc | sed
-                  's/localhost/127\.0\.0\.1/g' >> ~/.npmrc && cat ~/.npmrc
-            - run:
+            - name: Publish db package to the registry
+              run: >
                   cd .db_publishing && npm publish --registry
                   http://localhost:4873
-            - run: cd ..
             - name: Install dependencies
-              run: bun install --frozen-lockfile
+              run: rm bun.lock && bun install
             - name: Generate migrations
               run: bun run db:generate
             - name: Run tests
