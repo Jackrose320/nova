@@ -31,7 +31,9 @@ jobs:
             - run:
                   sed -n '/localhost/p' ~/.npmrc | sed
                   's/localhost/127\.0\.0\.1/g' >> ~/.npmrc && cat ~/.npmrc
-            - run: npm publish --registry http://localhost:4873
+            - run:
+                  cd .db_publishing && npm publish --registry
+                  http://localhost:4873
             - run: cd ..
             - name: Install dependencies
               run: bun install --frozen-lockfile
