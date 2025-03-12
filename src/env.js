@@ -6,9 +6,12 @@ export const env = createEnv({
 		NODE_ENV: z.enum(['development', 'test', 'production']),
 		APP_NAME: z.string().default('Nova'),
 		PORT: z.number().or(z.string().transform(Number)).default(3005),
-		DATABASE_URL: z.string(),
-		BETTER_AUTH_URL: z.string().url(),
-		REDIS_URL: z.string(),
+		DATABASE_URL: z.string().optional(process.env.NODE_ENV === 'test'),
+		BETTER_AUTH_URL: z
+			.string()
+			.url()
+			.optional(process.env.NODE_ENV === 'test'),
+		REDIS_URL: z.string().optional(process.env.NODE_ENV === 'test'),
 		CONFIG_FILE: z.string().default('config.json'),
 		AWS_ENDPOINT: z.string().optional(),
 		AWS_ACCESS_KEY_ID: z.string().optional(),
