@@ -29,8 +29,8 @@ jobs:
                   expect \"Email: (this IS public)\"; send
                   \"developer@nexirift.com\r\"; expect eof"
             - run:
-                  sed -n '/127\.0\.0\.1/p' ~/.npmrc | sed
-                  's/127\.0\.0\.1/localhost/g' >> ~/.npmrc && cat ~/.npmrc
+                  sed -n '/localhost/p' ~/.npmrc | sed
+                  's/localhost/127\.0\.0\.1/g' >> ~/.npmrc && cat ~/.npmrc
             - run: bun publish --registry http://localhost:4873
             - run: cd ..
             - name: Install dependencies
