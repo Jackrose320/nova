@@ -19,7 +19,9 @@ jobs:
                   path: ./.db_publishing
             - run: cd .db_publishing && bun install --frozen-lockfile
             - run: bunx verdaccio --listen 0.0.0.0:4873 &
-            - run: apt-add-repository universe && apt-get install expect
+            - run:
+                  sudo apt-add-repository universe && sudo apt-get install
+                  expect
             - run: >
                   /usr/bin/expect -c "spawn bunx npm adduser --registry
                   http://localhost:4873; expect \"Username:\"; send
