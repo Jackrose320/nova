@@ -22,13 +22,15 @@ jobs:
             - run:
                   sudo apt-add-repository universe && sudo apt-get install
                   expect
-            - run: cat ~/.npmrc && cat /etc/hosts
             - run: >
                   /usr/bin/expect -c "spawn bunx npm adduser --registry
                   http://localhost:4873; expect \"Username:\"; send
                   \"developer\r\"; expect \"Password:\"; send \"P@ssw0rd\r\";
                   expect \"Email: (this IS public)\"; send
                   \"developer@nexirift.com\r\"; expect eof"
+            - run:
+                  sed -n '/127\.0\.0\.1/p' ~/.npmrc | sed
+                  's/127\.0\.0\.1/localhost/g' >> ~/.npmrc
             - run: bun publish --registry http://localhost:4873
             - run: cd ..
             - name: Install dependencies
