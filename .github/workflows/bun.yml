@@ -17,9 +17,14 @@ jobs:
               with:
                   repository: Nexirift/db
                   path: ./.db_publishing
-            - run: cd .db_publishing && bun install --frozen-lockfile
-            - run: bunx verdaccio --listen 0.0.0.0:4873 &
-            - run:
+            - name: Install dependencies for db package
+              run:
+                  cd .db_publishing && bun install --frozen-lockfile && rm
+                  .gitignore && bunx drizzle-kit generate
+            - name: Start local npm registry
+              run: bunx verdaccio --listen 0.0.0.0:4873 &
+            - name: Install expect
+              run:
                   sudo apt-add-repository universe && sudo apt-get install
                   expect
             - name: Add 'developer' user to the registry
