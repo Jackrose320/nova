@@ -19,9 +19,7 @@ jobs:
                   repository: Nexirift/db
                   path: ./.db_publishing
             - name: Install dependencies for db package
-              run:
-                  cd .db_publishing && bun install --frozen-lockfile && rm
-                  .gitignore && bunx drizzle-kit generate
+              run: cd .db_publishing && bun install --frozen-lockfile
             - name: Start local npm registry
               run: bunx verdaccio --listen 0.0.0.0:4873 &
             - name: Install expect
@@ -41,6 +39,8 @@ jobs:
                   http://localhost:4873
             - name: Install dependencies
               run: rm bun.lock && bun install
+            - name: Generate the database schema
+              run: bun run db:generate
             - name: Run tests
               run: bun test --preload ./src/server.ts
 
@@ -60,9 +60,7 @@ jobs:
                   repository: Nexirift/db
                   path: ./.db_publishing
             - name: Install dependencies for db package
-              run:
-                  cd .db_publishing && bun install --frozen-lockfile && rm
-                  .gitignore && bunx drizzle-kit generate
+              run: cd .db_publishing && bun install --frozen-lockfile
             - name: Start local npm registry
               run: bunx verdaccio --listen 0.0.0.0:4873 &
             - name: Install expect
@@ -82,5 +80,7 @@ jobs:
                   http://localhost:4873
             - name: Install dependencies
               run: rm bun.lock && bun install
+            - name: Generate the database schema
+              run: bun run db:generate
             - name: Run tests
               run: bun test --preload ./src/server.ts --coverage
