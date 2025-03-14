@@ -5,8 +5,8 @@ import {
 	usernameClient
 } from 'better-auth/client/plugins';
 import { readFileSync } from 'fs';
-import { tokenClient } from './redis';
 import { env } from './env';
+import { tokenClient } from './redis';
 
 const file = (env.CONFIG_FILE as string) ?? 'config.json';
 

@@ -1,8 +1,8 @@
+import type { UserRelationshipSchemaType } from '@nexirift/db';
+import { db, userRelationship } from '@nexirift/db';
 import { and, eq, or } from 'drizzle-orm';
 import { builder } from '../../builder';
-import { Context } from '../../context';
-import { db } from '@nexirift/db';
-import { userRelationship, UserRelationshipSchemaType } from '@nexirift/db';
+import type { Context } from '../../context';
 import { throwError } from '../../helpers/common';
 import { UserRelationship } from '../../types';
 
@@ -235,7 +235,7 @@ async function modifyRelationship(
 					reason: args.reason
 				})
 				.returning()
-				.then((res) => res[0]);
+				.then((res) => res[0] || null);
 		}
 
 		// Handle blocking users
@@ -273,7 +273,7 @@ async function modifyRelationship(
 				reason: args.reason
 			})
 			.returning()
-			.then((res) => res[0]);
+			.then((res) => res[0] || null);
 	} else {
 		// Handle UNBLOCK, UNMUTE, and UNFOLLOW actions
 		if (!requestedRelationship) {
@@ -300,7 +300,7 @@ async function modifyRelationship(
 					)
 				)
 				.returning()
-				.then((res) => res[0]);
+				.then((res) => res[0] || null);
 		}
 
 		// Delete existing relationship
@@ -313,6 +313,6 @@ async function modifyRelationship(
 				)
 			)
 			.returning()
-			.then((res) => res[0]);
+			.then((res) => res[0] || null);
 	}
 }

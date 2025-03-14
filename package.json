@@ -9,8 +9,8 @@
 		"dev": "NODE_ENV=development bun --watch src/server.ts",
 		"start": "bun src/server.ts",
 		"db:generate": "cd node_modules/@nexirift/db && bun db:generate",
-		"db:migrate": "cd node_modules/@nexirift/db && bun db:migrate",
-		"db:studio": "cd node_modules/@nexirift/db && bun db:studio",
+		"db:migrate": "set -a && source .env && set +a && cd node_modules/@nexirift/db && bun db:migrate",
+		"db:studio": "set -a && source .env && set +a && cd node_modules/@nexirift/db && bun db:studio",
 		"db:all": "cd node_modules/@nexirift/db && bun db:all",
 		"db:start": "cd node_modules/@nexirift/db && bun db:start",
 		"db:reset": "cd node_modules/@nexirift/db && bun db:reset",
@@ -21,7 +21,8 @@
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.758.0",
 		"@aws-sdk/lib-storage": "^3.758.0",
-		"@nexirift/db": "^0.0.1",
+		"@graphql-yoga/plugin-response-cache": "^3.15.2",
+		"@nexirift/db": "0.0.1",
 		"@nexirift/plugin-better-auth": "^1.0.1",
 		"@pothos/core": "^4.5.0",
 		"@pothos/plugin-errors": "^4.2.0",
@@ -45,6 +46,7 @@
 	},
 	"devDependencies": {
 		"@electric-sql/pglite": "^0.2.17",
+		"@eslint/js": "^9.22.0",
 		"@faker-js/faker": "^9.6.0",
 		"@types/bun": "latest",
 		"@types/debug": "^4.1.12",
@@ -52,7 +54,12 @@
 		"@types/mime-types": "^2.1.4",
 		"aws-sdk-client-mock": "^4.1.0",
 		"drizzle-kit": "^0.30.5",
+		"eslint": "^9.22.0",
+		"eslint-plugin-autofix": "^2.2.0",
+		"eslint-plugin-import": "^2.31.0",
+		"globals": "^16.0.0",
 		"redis-memory-server": "^0.12.1",
-		"typescript": "^5.8.2"
+		"typescript": "^5.8.2",
+		"typescript-eslint": "^8.26.1"
 	}
 }

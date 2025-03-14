@@ -1,14 +1,14 @@
-import { and, eq } from 'drizzle-orm';
-import { builder } from '../../builder';
-import { Context } from '../../context';
-import { db } from '@nexirift/db';
 import {
+	db,
 	userConversation,
 	userConversationMessage,
 	userConversationParticipant,
 	userConversationParticipantRole,
 	userConversationRole
 } from '@nexirift/db';
+import { and, eq } from 'drizzle-orm';
+import { builder } from '../../builder';
+import type { Context } from '../../context';
 import { throwError } from '../../helpers/common';
 import {
 	checkPermissions,
@@ -74,6 +74,14 @@ const createConversation = async (
 		})
 		.returning()
 		.then((res) => res[0]);
+
+	if (!conversation) {
+		throwError(
+			'Failed to create conversation.',
+			'CONVERSATION_CREATION_FAILED'
+		);
+		return;
+	}
 
 	await db.insert(userConversationParticipant).values(
 		participants.map((userId) => ({
@@ -503,7 +511,7 @@ const handleParticipantRoles = async (
 		ctx.auth?.user?.id
 	);
 
-	const results = [];
+	const results: { participantId: string; roleId: string }[] = [];
 	for (const participant of participants) {
 		for (const role of roles) {
 			const existingRole =
@@ -531,7 +539,9 @@ const handleParticipantRoles = async (
 					.returning()
 					.then((res) => res[0]);
 
-				results.push(newRole);
+				if (newRole) {
+					results.push(newRole);
+				}
 			} else {
 				if (!existingRole)
 					throwError(
@@ -553,7 +563,9 @@ const handleParticipantRoles = async (
 					.returning()
 					.then((res) => res[0]);
 
-				results.push(deletedRole);
+				if (deletedRole) {
+					results.push(deletedRole);
+				}
 			}
 		}
 	}

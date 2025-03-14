@@ -1,6 +1,6 @@
-import { builder } from '../../builder';
-import { Context } from '../../context';
 import { db } from '@nexirift/db';
+import { builder } from '../../builder';
+import type { Context } from '../../context';
 import {
 	getConversation,
 	getParticipant

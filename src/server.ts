@@ -1,3 +1,4 @@
+import { useResponseCache } from '@graphql-yoga/plugin-response-cache';
 import { db, migrator, prodDbClient, user } from '@nexirift/db';
 import { authorize, useBetterAuth } from '@nexirift/plugin-better-auth';
 import { beforeAll } from 'bun:test';
@@ -6,20 +7,21 @@ import { handleProtocols, makeHandler } from 'graphql-ws/lib/use/bun';
 import { createYoga, useReadinessCheck } from 'graphql-yoga';
 import { version } from '../package.json';
 import { config } from './config';
-import { type Context } from './context';
+import type { Context } from './context';
+import { env } from './env';
 import getGitCommitHash from './git';
 import { enableAll } from './lib/logger';
 import { isTestMode, mediaUploadEndpoint } from './lib/server';
 import { pubsub } from './pubsub';
 import { redisClient, tokenClient } from './redis';
 import { schema } from './schema';
-import { env } from './env';
 
 // Create a new instance of GraphQL Yoga with the schema and plugins.
 const yoga = createYoga({
 	schema: schema,
 	graphiql: false,
 	maskedErrors: false,
+	logging: 'debug',
 	graphqlEndpoint: '/',
 	plugins: [
 		useBetterAuth(config.auth),
@@ -32,6 +34,13 @@ const yoga = createYoga({
 					console.error(err);
 					return false;
 				}
+			}
+		}),
+		useResponseCache({
+			session: (request) => request.headers.get('authentication'),
+			ttl: 2_000,
+			scopePerSchemaCoordinate: {
+				'Query.me': 'PRIVATE'
 			}
 		})
 	]
@@ -94,7 +103,7 @@ export async function startServer() {
 				if (ctx.extra.socket.data) {
 					const auth = await authorize(
 						config.auth,
-						(ctx.extra.socket.data! as string).split(' ')[1]
+						(ctx.extra.socket.data! as string).split(' ')[1]!
 					);
 					const authString = JSON.stringify(auth);
 					try {
@@ -102,7 +111,7 @@ export async function startServer() {
 							auth,
 							pubsub
 						} as Context;
-					} catch (e) {
+					} catch {
 						ctx.extra.socket.send(
 							JSON.stringify({
 								type: 'pong',
@@ -121,8 +130,12 @@ export async function startServer() {
 	});
 
 	// Connect to Redis.
-	await redisClient.connect();
-	await tokenClient.connect();
+	try {
+		await redisClient.connect();
+		await tokenClient.connect();
+	} catch (err) {
+		console.error(err);
+	}
 
 	if (!isTestMode) {
 		// Connect to the database.

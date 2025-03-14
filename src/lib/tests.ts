@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { db, user } from '@nexirift/db';
+import { eq } from 'drizzle-orm';
 import { config } from '../config';
-import { db } from '@nexirift/db';
-import { user } from '@nexirift/db';
 import { tokenClient } from '../redis';
 import { eq } from 'drizzle-orm';
 

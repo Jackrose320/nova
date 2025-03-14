@@ -1,8 +1,8 @@
+import type { UserSchemaType } from '@nexirift/db';
+import { db } from '@nexirift/db';
 import { Organisation, OrganisationMember } from '..';
 import { builder } from '../../builder';
-import { Context } from '../../context';
-import { db } from '@nexirift/db';
-import { type UserSchemaType } from '@nexirift/db';
+import type { Context } from '../../context';
 import { privacyGuardian } from '../../lib/guardian';
 import { Post } from '../post';
 import { PostInteraction } from '../post/Interaction';
@@ -22,9 +22,7 @@ User.implement({
 		id: t.exposeString('id', {
 			nullable: false
 		}),
-		username: t.exposeString('username', {
-			nullable: false
-		}),
+		username: t.exposeString('displayUsername'),
 		displayName: t.exposeString('displayName', { nullable: true }),
 		bio: t.exposeString('bio', { nullable: true }),
 		extendedBio: t.exposeString('extendedBio', { nullable: true }),
@@ -49,7 +47,7 @@ User.implement({
 		profileFields: t.field({
 			type: [UserProfileField],
 			nullable: true,
-			authScopes: (parent, _args, context, _info) =>
+			authScopes: (parent, _args, context) =>
 				privacyGuardian(parent, context.auth),
 			unauthorizedResolver: () => [],
 			resolve: async (user) => {
@@ -92,7 +90,7 @@ User.implement({
 				first: t.arg({ type: 'Int' }),
 				offset: t.arg({ type: 'Int' })
 			},
-			authScopes: (parent, _args, context, _info) =>
+			authScopes: (parent, _args, context) =>
 				privacyGuardian(parent, context.auth),
 			unauthorizedResolver: () => [],
 			resolve: async (user, args) => {
@@ -117,7 +115,7 @@ User.implement({
 				first: t.arg({ type: 'Int' }),
 				offset: t.arg({ type: 'Int' })
 			},
-			authScopes: (parent, _args, context, _info) =>
+			authScopes: (parent, _args, context) =>
 				privacyGuardian(parent, context.auth),
 			unauthorizedResolver: () => [],
 			resolve: async (user, args) => {
@@ -138,7 +136,7 @@ User.implement({
 		media: t.field({
 			type: [PostMedia],
 			nullable: true,
-			authScopes: (parent, _args, context, _info) =>
+			authScopes: (parent, _args, context) =>
 				privacyGuardian(parent, context.auth),
 			unauthorizedResolver: () => [],
 			resolve: async (user) => {
@@ -149,7 +147,7 @@ User.implement({
 					}
 				});
 
-				var filteredResult: (typeof PostMedia.$inferType)[] = [];
+				const filteredResult: (typeof PostMedia.$inferType)[] = [];
 
 				result.forEach((post) => {
 					if (post?.media) {
@@ -164,7 +162,7 @@ User.implement({
 		interactions: t.field({
 			type: [PostInteraction],
 			nullable: true,
-			authScopes: (parent, _args, context, _info) =>
+			authScopes: (parent, _args, context) =>
 				privacyGuardian(parent, context.auth),
 			args: {
 				first: t.arg({ type: 'Int' }),
@@ -176,7 +174,7 @@ User.implement({
 				const type = args.type! as 'LIKE' | 'REPOST';
 
 				const result = await db.query.postInteraction.findMany({
-					where: (postInteraction, { and, eq, ne }) =>
+					where: (postInteraction, { and, eq }) =>
 						user.id === context.auth?.user.id
 							? and(
 									eq(postInteraction.userId, user.id),
@@ -202,7 +200,7 @@ User.implement({
 				first: t.arg({ type: 'Int' }),
 				after: t.arg({ type: 'Int' })
 			},
-			authScopes: (parent, _args, context, _info) =>
+			authScopes: (parent, _args, context) =>
 				privacyGuardian(parent, context.auth),
 			unauthorizedResolver: () => [],
 			resolve: async (user, args, context: Context) => {
